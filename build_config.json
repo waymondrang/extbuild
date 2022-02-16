@@ -1,0 +1,33 @@
+{
+    "project_name_short": "extbuild",
+    "enforce_version_control": true,
+    "clean_manifest": false,
+    "default_actions": ["copy"],
+    "release_directory": "../releases",
+    "source": {
+        "directory": "../src/chrome",
+        "platform": "chrome"
+    },
+    "targets": [
+        {
+            "directory": "../src/firefox",
+            "platform": "firefox",
+            "manifest_version": 2,
+            "patch": [
+                "index.js",
+                "background.js"
+            ]
+        },
+        {
+            "directory": "../temp/opera",
+            "platform": "opera",
+            "manifest_version": 2,
+            "temp": true
+        }
+    ],
+    "git_messages": {
+        "directory_sync": "automated directory sync",
+        "packages": "automated package build"
+    },
+    "debug": false
+}
