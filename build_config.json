@@ -1,8 +1,8 @@
 {
-    "project_name_short": "dad",
+    "project_name_short": "extbuild",
     "enforce_version_control": true,
     "clean_manifest": true,
-    "default_actions": [""],
+    "default_actions": ["copy"],
     "release_directory": "../releases",
     "source": {
         "directory": "../src/chrome",
@@ -14,14 +14,15 @@
             "platform": "firefox",
             "manifest_version": 2,
             "patch": [
-                "word.js",
-                "popup.js"
+                "index.js",
+                "background.js"
             ]
         },
         {
             "directory": "../src/opera",
             "platform": "opera",
-            "manifest_version": 2
+            "manifest_version": 2,
+            "temp": true
         }
     ],
     "git_messages": {
