@@ -74,11 +74,11 @@ The relative path of the release directory, where packages will be created. If t
 
 An object containing information on the source directory.
 
-### `directory`
+#### `directory`
 
 The relative path of the source directory. This path must exist and contain a `manifest.json` file.
 
-### `platform`
+#### `platform`
 
 The platform of the source directory. Supports `chrome` and `firefox`.
 
@@ -86,25 +86,25 @@ The platform of the source directory. Supports `chrome` and `firefox`.
 
 An array of objects containing information on the build targets.
 
-### `directory`
+#### `directory`
 
 The relative path of the source directory. If `temp` is `true`,  this will be the relative path of the temporary directory. If the directory does not exist, one will be created.
 
-### `platform`
+#### `platform`
 
 The platform of the target. Supports `chrome`, `firefox`, `opera`, and `edge`.
 
-### `manifest_version`
+#### `manifest_version`
 
 The manifest version of the target.
 
-### `patch`
+#### `patch`
 
 Array of files to patch. Patches version and platform-specific methods, including changing `chrome` to `browser` for Firefox and `browserAction` to `action` for sync between manifest V2 and V3. 
 
 `manifest.json` files will be synced by default, it does not need to be included in `patch`.
 
-### `temp`
+#### `temp`
 
 If `true`, the target directory will only be created if the package action is invoked, in which the directory will be removed after the process has finished.
 
