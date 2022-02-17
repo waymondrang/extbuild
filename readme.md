@@ -1,6 +1,6 @@
 ## Extension Builder
 
-A bundle of scripts for automated packaging of browser extensions for multiple platforms.
+A bundle of scripts for automated packaging of browser extensions for different platforms and manifest versions.
 
 ## Settings
 
