@@ -3,14 +3,14 @@
     "enforce_version_control": true,
     "clean_manifest": true,
     "default_actions": ["copy"],
-    "release_directory": "../releases",
+    "release_directory": "./releases",
     "source": {
-        "directory": "../src/chrome",
+        "directory": "./src/chrome",
         "platform": "chrome"
     },
     "targets": [
         {
-            "directory": "../src/firefox",
+            "directory": "./src/firefox",
             "platform": "firefox",
             "manifest_version": 2,
             "patch": [
@@ -19,10 +19,10 @@
             ]
         },
         {
-            "directory": "../src/opera",
+            "directory": "./src/opera",
             "platform": "opera",
             "manifest_version": 2,
-            "temp": true
+            "temp": false
         }
     ],
     "git_messages": {
