@@ -52,6 +52,7 @@ const version_exists = fs.existsSync(`${config.release_directory}/${config.proje
 const browser_platforms = ["firefox"];
 const chrome_platforms = ["chrome", "opera", "edge"];
 const manifest_ignore = ["manifest_version"];
+const scripts_directory = config.scripts_directory ? config.scripts_directory.endsWith("\\") ? config.scripts_directory : config.scripts_directory.concat("\\") : "";
 
 var targets = config.targets;
 
@@ -190,7 +191,7 @@ if (will_copy) {
     log("synced files between " + config.source.platform + " and " + targets.map(e => e.platform).join(", ") + " directories");
     if (will_git) {
         log("pushing synced directories to github");
-        execSync(`git.sh \"${config.git_messages.directory_sync}\"`);
+        execSync(`${scripts_directory}git.sh \"${config.git_messages.directory_sync}\"`);
     }
 } else {
     log("skipped copying files");
@@ -201,7 +202,7 @@ if (will_package) {
     var packages = targets;
     packages.push(config.source);
     for (var package of packages) {
-        execSync(`package.sh \"v${source_manifest.version}\" \"${config.project_name_short}\" \"${package.platform}\" \"${package.directory}\" \"${config.release_directory}\" \"${package.temp ? "--temp" : ""}`);
+        execSync(`${scripts_directory}package.sh \"v${source_manifest.version}\" \"${config.project_name_short}\" \"${package.platform}\" \"${package.directory}\" \"${config.release_directory}\" \"${package.temp ? "--temp" : ""}`);
         log(`packaged ${source_manifest.version} for ` + package.platform);
         if (package.temp) {
             log("removing temporary target directory " + package.directory);
@@ -211,7 +212,7 @@ if (will_package) {
     }
     if (will_git) {
         log("pushing completed packages to github");
-        execSync(`git.sh \"${config.git_messages.packages}\"`);
+        execSync(`${scripts_directory}git.sh \"${config.git_messages.packages}\"`);
     }
 } else {
     log("skipping zipping files");
