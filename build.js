@@ -50,7 +50,6 @@ const will_copy = process.argv.includes("--copy") || process.argv.includes("--al
 const will_git = process.argv.includes("--git") || process.argv.includes("--all") || config.default_actions.includes("git");
 const version_exists = fs.existsSync(`${config.release_directory}/${config.project_name_short}_v${source_manifest.version}_${config.source.platform}.zip`);
 const browser_platforms = ["firefox"];
-const chrome_platforms = ["chrome", "opera", "edge"];
 const manifest_ignore = ["manifest_version"];
 const scripts_directory = config.scripts_directory ? config.scripts_directory.endsWith("\\") ? config.scripts_directory : config.scripts_directory.concat("\\") : "";
 
