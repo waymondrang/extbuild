@@ -3,7 +3,7 @@
     "fs-extra": "^10.0.0"
   },
   "name": "extension-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "build.js",
   "devDependencies": {},
   "scripts": {
