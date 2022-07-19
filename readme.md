@@ -6,29 +6,30 @@ A bundle of scripts for automated packaging of browser extensions for different 
 
 ```json
 {
-    "project_name_short": "extbuild",
-    "enforce_version_control": true,      
-    "clean_manifest": true,                  
-    "default_actions": ["copy"],           
-    "release_directory": "../releases",   
-    "source": {
-        "directory": "../src/chrome",   
-        "platform": "chrome"               
-    },
-    "targets": [                         
-        {
-            "directory": "../src/firefox",
-            "platform": "firefox",         
-            "manifest_version": 2,         
-            "patch": [],                  
-            "temp": true                       
-        }
-    ],
-    "git_messages": {
-        "directory_sync": "automated directory sync",
-        "packages": "automated package build"
-    },
-    "debug": false
+  "project_name_short": "extbuild",
+  "enforce_version_control": true,
+  "clean_manifest": true,
+  "default_actions": ["copy"],
+  "release_directory": "../releases",
+  "source": {
+    "directory": "../src/chrome",
+    "platform": "chrome"
+  },
+  "targets": [
+    {
+      "directory": "../src/firefox",
+      "platform": "firefox",
+      "manifest_version": 2,
+      "patch": [],
+      "temp": true
+    }
+  ],
+  "git_messages": {
+    "directory_sync": "automated directory sync",
+    "packages": "automated package build"
+  },
+  "debug": false,
+  "scripts_directory": "build_scripts\\"
 }
 ```
 
@@ -88,7 +89,7 @@ An array of objects containing information on the build targets.
 
 #### `directory`
 
-The relative path of the source directory. If `temp` is `true`,  this will be the relative path of the temporary directory. If the directory does not exist, one will be created.
+The relative path of the source directory. If `temp` is `true`, this will be the relative path of the temporary directory. If the directory does not exist, one will be created.
 
 #### `platform`
 
@@ -100,7 +101,7 @@ The manifest version of the target.
 
 #### `patch`
 
-Array of files to patch. Patches version and platform-specific methods, including changing `chrome` to `browser` for Firefox and `browserAction` to `action` for sync between manifest V2 and V3. 
+Array of files to patch. Patches version and platform-specific methods, including changing `chrome` to `browser` for Firefox and `browserAction` to `action` for sync between manifest V2 and V3.
 
 `manifest.json` files will be synced by default, it does not need to be included in `patch`.
 
@@ -111,3 +112,11 @@ If `true`, the target directory will only be created if the package action is in
 ## `git_messages`
 
 Commit messages used when the git action is invoked.
+
+## `debug`
+
+Extra console output
+
+## `scripts_directory`
+
+If invoking the script via `npm`, this field is required to point the program to the .sh scripts.

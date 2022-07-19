@@ -2,7 +2,9 @@
     "project_name_short": "extbuild",
     "enforce_version_control": true,
     "clean_manifest": true,
-    "default_actions": ["copy"],
+    "default_actions": [
+        "copy"
+    ],
     "release_directory": "../releases",
     "source": {
         "directory": "../src/chrome",
@@ -29,5 +31,6 @@
         "directory_sync": "automated directory sync",
         "packages": "automated package build"
     },
-    "debug": false
+    "debug": false,
+    "scripts_directory": "build_scripts\\"
 }
