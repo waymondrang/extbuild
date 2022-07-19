@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# extbuild
+# https://github.com/waymondrang/extbuild
+
 if [ $# -eq 0 ]; then
     echo "missing arguments"
     read -n 1

@@ -1,3 +1,8 @@
+#!/usr/bin/env node
+
+// extbuild
+// https://github.com/waymondrang/extbuild
+
 var ogl = console.log;
 var log = function () {
     a = [];
@@ -8,7 +13,13 @@ var log = function () {
     ogl.apply(console, a);
 };
 
-log_d = function () {
+/**
+ * Debug log channel
+ * 
+ * Do not invoke before build_config.json is loaded
+ * @returns void
+ */
+var log_d = function () {
     if (!config.debug) return;
     a = [];
     a.push(`[${new Date().toLocaleTimeString()}][info] \t`);
@@ -26,16 +37,27 @@ var log_w = function () {
     ogl.apply(console, a);
 };
 
-log("\x1b[32m" + "initializing extension builder™" + "\x1b[0m");
+log("\x1b[32m" + "initializing extension builder™ in " + "\x1b[0m");
+
+log("\x1b[32m" + process.cwd() + "\x1b[0m");
 
 const start_time = new Date();
 const fs = require('fs-extra');
 const { execSync } = require("child_process");
-const config = require("./build_config.json");
+var config;
 
 process.on("exit", function (code) {
     log("\x1b[36m" + "process exited in " + ((new Date() - start_time) / 1000) + " seconds with code " + code + "\x1b[0m");
-})
+});
+
+try {
+    var data = fs.readFileSync("build_config.json", "utf8");
+    config = JSON.parse(data);
+    log("build_config.json found");
+} catch (e) {
+    log_w("build_config.json not found");
+    process.exit(99);
+}
 
 try {
     var source_manifest = JSON.parse(fs.readFileSync(config.source.directory + "/" + "manifest.json").toString());
@@ -51,23 +73,17 @@ const will_git = process.argv.includes("--git") || process.argv.includes("--all"
 const version_exists = fs.existsSync(`${config.release_directory}/${config.project_name_short}_v${source_manifest.version}_${config.source.platform}.zip`);
 const browser_platforms = ["firefox"];
 const manifest_ignore = ["manifest_version"];
-const scripts_directory = config.scripts_directory ? config.scripts_directory.endsWith("\\") ? config.scripts_directory : config.scripts_directory.concat("\\") : "";
+
+// variable isn't used anymore but keeping for future reference
+const scripts_directory = "";
 
 var targets = config.targets;
 
-//* validation
-
-if (version_exists) {
-    log_w("packaged version already exists!");
-    if (config["enforce_version_control"] && will_package && !force_mode) process.exit(99);
-}
+log("\x1b[32m" + "actions to perform: " + (will_copy ? "copy " : "") + (will_package ? "package " : "") + (will_git ? "git " : "") + "\x1b[0m");
 
 log_d(config.debug ? "debug mode " : "" +
-    will_copy ? "will copy " : "" +
-        will_package ? "will package " : "" +
-            will_git ? "will git " : "" +
-                version_exists ? "version exists " : "" +
-                    force_mode ? "force mode " : "");
+    version_exists ? "version exists " : "" +
+        force_mode ? "force mode " : "");
 
 if (!fs.existsSync(config.release_directory) || !fs.statSync(config.release_directory).isDirectory()) {
     log("creating release directory " + config.release_directory);
@@ -75,7 +91,7 @@ if (!fs.existsSync(config.release_directory) || !fs.statSync(config.release_dire
     log("created release directory " + config.release_directory);
 }
 
-//* manifest updates should happen here
+// manifest updates should happen here
 
 log("updating " + targets.map(e => e.platform).join(", ") + " manifests using " + config.source.platform + " manifest");
 
@@ -136,10 +152,10 @@ for (var target of targets) {
 log("updated " + targets.map(e => e.platform).join(", ") + " manifests using " + config.source.platform + " manifest");
 
 if (will_copy) {
-    log("syncing files between " + config.source.platform + " and " + targets.map(e => e.platform).join(", ") + " directories");
+    log("copying files between " + config.source.platform + " and " + targets.map(e => e.platform).join(", ") + " directories");
     for (var target of targets) {
         if (target.temp && !will_package) {
-            log_d("skipping syncing " + target.directory);
+            log_d("skipping copying " + target.directory);
             continue;
         }
         var files = fs.readdirSync(config.source.directory);
@@ -187,14 +203,28 @@ if (will_copy) {
         }
         log_d("finished copying " + files.length + " files from " + config.source.platform + " into " + target.platform + " directory");
     }
-    log("synced files between " + config.source.platform + " and " + targets.map(e => e.platform).join(", ") + " directories");
+    log("copied files between " + config.source.platform + " and " + targets.map(e => e.platform).join(", ") + " directories");
     if (will_git) {
         log("pushing synced directories to github");
         execSync(`${scripts_directory}git.sh \"${config.git_messages.directory_sync}\"`);
     }
-} else {
-    log("skipped copying files");
+    log("copying finished");
 }
+
+// packaging section
+
+// first, validation
+
+if (version_exists) {
+    if (config["enforce_version_control"] && will_package && !force_mode) {
+        log_w("will not overwrite existing packages for version " + source_manifest.version);
+        process.exit(99);
+    }
+    if (will_package)
+        log_w("overwriting existing packages for version " + source_manifest.version);
+}
+
+// then, package
 
 if (will_package) {
     log(`packaging ${source_manifest.version} for ` + targets.map(e => e.platform).join(", ") + " & " + config.source.platform);
@@ -213,6 +243,4 @@ if (will_package) {
         log("pushing completed packages to github");
         execSync(`${scripts_directory}git.sh \"${config.git_messages.packages}\"`);
     }
-} else {
-    log("skipping zipping files");
 }

@@ -35,6 +35,5 @@
         "directory_sync": "automated directory sync",
         "packages": "automated package build"
     },
-    "debug": true,
-    "scripts_directory": "build_scripts\\"
+    "debug": true
 }
