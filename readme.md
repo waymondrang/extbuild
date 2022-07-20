@@ -2,7 +2,32 @@
 
 A command line tool to help package browser extensions for different platforms and manifest versions.
 
-## Settings
+## Features
+
+- Set project-specific configurations
+- Sync files between source and target directories
+- Package (zip) targets for distribution
+- Create temporary target directories
+- Prevent version overwrite
+- Clean manifest.json
+
+## Installation
+
+To use extbuild in the terminal, install with the `-g` option
+
+```console
+npm install -g extbuild
+```
+
+## Usage
+
+Navigate the current working directory to where build_config.json is an immediate child, then run
+
+```console
+extbuild
+```
+
+## Configuration
 
 ```json
 {
@@ -28,8 +53,7 @@ A command line tool to help package browser extensions for different platforms a
     "directory_sync": "automated directory sync",
     "packages": "automated package build"
   },
-  "debug": false,
-  "scripts_directory": "build_scripts\\"
+  "debug": false
 }
 ```
 
