@@ -1,4 +1,4 @@
-## Extension Builder
+# Extension Builder
 
 A command line tool to help package browser extensions for different platforms and manifest versions.
 
