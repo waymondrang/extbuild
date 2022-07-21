@@ -8,7 +8,7 @@
     "Extension",
     "Command"
   ],
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "build.js",
   "devDependencies": {},
   "scripts": {
