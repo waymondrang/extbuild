@@ -44,6 +44,7 @@ log("\x1b[32m" + process.cwd() + "\x1b[0m");
 const start_time = new Date();
 const fs = require('fs-extra');
 const { execSync } = require("child_process");
+const path = require('path');
 var config;
 
 process.on("exit", function (code) {
@@ -75,7 +76,7 @@ const browser_platforms = ["firefox"];
 const manifest_ignore = ["manifest_version"];
 
 // variable isn't used anymore but keeping for future reference
-const scripts_directory = "";
+const scripts_directory = __dirname;
 
 var targets = config.targets;
 
@@ -206,7 +207,7 @@ if (will_copy) {
     log("copied files between " + config.source.platform + " and " + targets.map(e => e.platform).join(", ") + " directories");
     if (will_git) {
         log("pushing synced directories to github");
-        execSync(`${scripts_directory}git.sh \"${config.git_messages.directory_sync}\"`);
+        execSync(`${path.join(scripts_directory, "git.sh")} \"${config.git_messages.directory_sync}\"`, { shell: true, windowsHide: true });
     }
     log("copying finished");
 }
@@ -231,7 +232,9 @@ if (will_package) {
     var packages = targets;
     packages.push(config.source);
     for (var package of packages) {
-        execSync(`${scripts_directory}package.sh \"v${source_manifest.version}\" \"${config.project_name_short}\" \"${package.platform}\" \"${package.directory}\" \"${config.release_directory}\" \"${package.temp ? "--temp" : ""}`);
+        var command = `${path.join(scripts_directory, config.debug ? "package.d.sh" : "package.sh")} \"v${source_manifest.version}\" \"${config.project_name_short}\" \"${package.platform}\" \"${package.directory}\" \"${config.release_directory}\" \"${package.temp ? "--temp" : ""}`;
+        log_d("executing " + command);
+        execSync(command, { shell: true, windowsHide: true });
         log(`packaged ${source_manifest.version} for ` + package.platform);
         if (package.temp) {
             log("removing temporary target directory " + package.directory);
@@ -241,6 +244,6 @@ if (will_package) {
     }
     if (will_git) {
         log("pushing completed packages to github");
-        execSync(`${scripts_directory}git.sh \"${config.git_messages.packages}\"`);
+        execSync(`${path.join(scripts_directory, "git.sh")} \"${config.git_messages.packages}\"`, { shell: true, windowsHide: true });
     }
 }
