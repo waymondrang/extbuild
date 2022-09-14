@@ -72,7 +72,7 @@ const will_package = process.argv.includes("--all") || process.argv.includes("--
 const will_copy = process.argv.includes("--copy") || process.argv.includes("--all") || config.default_actions.includes("copy");
 const will_git = process.argv.includes("--git") || process.argv.includes("--all") || config.default_actions.includes("git");
 const version_exists = fs.existsSync(`${config.release_directory}/${config.project_name_short}_v${source_manifest.version}_${config.source.platform}.zip`);
-const browser_platforms = ["firefox"];
+const browser_platforms = ["firefox", "opera", "chrome"];
 const manifest_ignore = ["manifest_version"];
 
 // variable isn't used anymore but keeping for future reference
@@ -189,7 +189,7 @@ if (will_copy) {
                         log("bump manifest version not yet supported");
                         process.exit(1);
                     } else {
-                        log("manifest is equal, skipping parsing for file " + file);
+                        log("manifest is equal, still will process browser api compatibility " + file);
                         target_file = browser_platforms.includes(target.platform) ? source_file
                             .replace(/chrome\./gm, "browser\.") :
                             source_file;
