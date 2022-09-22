@@ -72,7 +72,7 @@ const will_package = process.argv.includes("--all") || process.argv.includes("--
 const will_copy = process.argv.includes("--copy") || process.argv.includes("--all") || config.default_actions.includes("copy");
 const will_git = process.argv.includes("--git") || process.argv.includes("--all") || config.default_actions.includes("git");
 const version_exists = fs.existsSync(`${config.release_directory}/${config.project_name_short}_v${source_manifest.version}_${config.source.platform}.zip`);
-const browser_platforms = ["firefox", "opera", "chrome"];
+const browser_platforms = ["firefox"];
 const manifest_ignore = ["manifest_version"];
 
 // variable isn't used anymore but keeping for future reference
@@ -92,7 +92,7 @@ if (!fs.existsSync(config.release_directory) || !fs.statSync(config.release_dire
     log("created release directory " + config.release_directory);
 }
 
-// manifest updates should happen here
+// manifest updates happen here
 
 log("updating " + targets.map(e => e.platform).join(", ") + " manifests using " + config.source.platform + " manifest");
 
@@ -136,14 +136,21 @@ for (var target of targets) {
         }
         if (source_manifest.manifest_version == 3 && target.manifest_version == 2) {
             if (field == "web_accessible_resources") {
-                target.manifest[field] = source_manifest[field][0].resources;
+                target.manifest.web_accessible_resources = source_manifest.web_accessible_resources[0].resources;
                 continue;
             }
             if (field == "action") {
                 target.manifest.browser_action = source_manifest.action;
                 continue;
             }
+            if (field == "background") {
+                target.manifest.background = {
+                    scripts: [source_manifest.background.service_worker]
+                };
+                continue;
+            }
         }
+        // If not a special case, just copy the field
         target.manifest[field] = source_manifest[field];
     }
     log_d("writing manifest.json to " + target.directory + "/manifest.json");
@@ -171,10 +178,9 @@ if (will_copy) {
                 log_d("skipping manifest file");
                 continue;
             }
-            if (!target.patch || !target.patch.includes(file)) {
-                log_d("copying " + (file.length > 30 ? file.substring(0, 30) + "..." : file) + " to " + target.directory + "/" + (file.length > 30 ? file.substring(0, 30) + "..." : file));
-                fs.copySync(config.source.directory + "/" + file, target.directory + "/" + file);
-            } else {
+            log_d("copying " + (file.length > 30 ? file.substring(0, 30) + "..." : file) + " to " + target.directory + "/" + (file.length > 30 ? file.substring(0, 30) + "..." : file));
+            fs.copySync(config.source.directory + "/" + file, target.directory + "/" + file);
+            if (target.patch && target.patch.includes(file)) {
                 log_d("processing " + file);
                 var source_file = fs.readFileSync(config.source.directory + "/" + file, { encoding: "utf-8" }).toString();
                 var target_file;
@@ -232,7 +238,7 @@ if (will_package) {
     var packages = targets;
     packages.push(config.source);
     for (var package of packages) {
-        var command = `${path.join(scripts_directory, config.debug ? "package.d.sh" : "package.sh")} \"v${source_manifest.version}\" \"${config.project_name_short}\" \"${package.platform}\" \"${package.directory}\" \"${config.release_directory}\" \"${package.temp ? "--temp" : ""}`;
+        var command = `${path.join(scripts_directory, config.debug ? "package.d.sh" : "package.sh")} \"v${source_manifest.version}\" \"${config.project_name_short}\" \"${package.platform}\" \"${package.directory}\" \"${config.release_directory}\" ${package.temp ? "--temp" : ""}`;
         log_d("executing " + command);
         execSync(command, { shell: true, windowsHide: true });
         log(`packaged ${source_manifest.version} for ` + package.platform);
