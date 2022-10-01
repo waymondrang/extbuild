@@ -168,6 +168,7 @@ if (will_copy) {
         }
         var files = fs.readdirSync(config.source.directory);
         for (var file of files) {
+            let all_js = target.patch.includes("*.js"); // messy "wildcard" support
             if (fs.statSync(config.source.directory + "/" + file).isDirectory()) {
                 log_d("expanding directory " + config.source.directory + "/" + file);
                 var directory_files = fs.readdirSync(config.source.directory + "/" + file);
@@ -180,7 +181,7 @@ if (will_copy) {
             }
             log_d("copying " + (file.length > 30 ? file.substring(0, 30) + "..." : file) + " to " + target.directory + "/" + (file.length > 30 ? file.substring(0, 30) + "..." : file));
             fs.copySync(config.source.directory + "/" + file, target.directory + "/" + file);
-            if (target.patch && target.patch.includes(file)) {
+            if (target.patch && (target.patch.includes(file) || (all_js && file.endsWith(".js")))) {
                 log_d("processing " + file);
                 var source_file = fs.readFileSync(config.source.directory + "/" + file, { encoding: "utf-8" }).toString();
                 var target_file;
