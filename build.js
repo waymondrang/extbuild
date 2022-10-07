@@ -3,7 +3,20 @@
 // extbuild
 // https://github.com/waymondrang/extbuild
 
-var ogl = console.log;
+const start_time = new Date();
+const fs = require('fs-extra');
+const { execSync } = require("child_process");
+const path = require('path');
+const ogl = console.log;
+
+var config;
+
+/**
+ * Default log channel
+ * 
+ * Independent of build_config.json
+ * @returns void
+ */
 var log = function () {
     a = [];
     a.push(`[${new Date().toLocaleTimeString()}][info] \t`);
@@ -29,6 +42,12 @@ var log_d = function () {
     ogl.apply(console, a);
 };
 
+/**
+ * Warning log channel
+ * 
+ * Independent of build_config.json
+ * @returns void
+ */
 var log_w = function () {
     a = [];
     a.push("\x1b[33m" + `[${new Date().toLocaleTimeString()}][warn] \t`);
@@ -40,12 +59,6 @@ var log_w = function () {
 log("\x1b[32m" + "initializing extension builder™ in " + "\x1b[0m");
 
 log("\x1b[32m" + process.cwd() + "\x1b[0m");
-
-const start_time = new Date();
-const fs = require('fs-extra');
-const { execSync } = require("child_process");
-const path = require('path');
-var config;
 
 process.on("exit", function (code) {
     log("\x1b[36m" + "process exited in " + ((new Date() - start_time) / 1000) + " seconds with code " + code + "\x1b[0m");
