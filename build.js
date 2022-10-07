@@ -8,8 +8,15 @@ const fs = require('fs-extra');
 const { execSync } = require("child_process");
 const path = require('path');
 const ogl = console.log;
+const browser_platforms = ["firefox"];
+const manifest_ignore = ["manifest_version"];
+
+// variable isn't used anymore but keeping for future reference
+const scripts_directory = __dirname;
 
 var config;
+var source_manifest;
+var targets; // from build_config.json
 
 /**
  * Default log channel
@@ -64,17 +71,18 @@ process.on("exit", function (code) {
     log("\x1b[36m" + "process exited in " + ((new Date() - start_time) / 1000) + " seconds with code " + code + "\x1b[0m");
 });
 
+// find and load build_config.json
 try {
-    var data = fs.readFileSync("build_config.json", "utf8");
-    config = JSON.parse(data);
+    config = JSON.parse(fs.readFileSync("build_config.json", "utf8"));
     log("build_config.json found");
 } catch (e) {
     log_w("build_config.json not found");
     process.exit(99);
 }
 
+// find and load source_manifest.json
 try {
-    var source_manifest = JSON.parse(fs.readFileSync(config.source.directory + "/" + "manifest.json").toString());
+    source_manifest = JSON.parse(fs.readFileSync(config.source.directory + "/" + "manifest.json", "utf8"));
 } catch {
     log_w("could not read source manifest in ", config.source.directory);
     process.exit(99);
@@ -85,13 +93,8 @@ const will_package = process.argv.includes("--all") || process.argv.includes("--
 const will_copy = process.argv.includes("--copy") || process.argv.includes("--all") || config.default_actions.includes("copy");
 const will_git = process.argv.includes("--git") || process.argv.includes("--all") || config.default_actions.includes("git");
 const version_exists = fs.existsSync(`${config.release_directory}/${config.project_name_short}_v${source_manifest.version}_${config.source.platform}.zip`);
-const browser_platforms = ["firefox"];
-const manifest_ignore = ["manifest_version"];
 
-// variable isn't used anymore but keeping for future reference
-const scripts_directory = __dirname;
-
-var targets = config.targets;
+targets = config.targets;
 
 log("\x1b[32m" + "actions to perform: " + (will_copy ? "copy " : "") + (will_package ? "package " : "") + (will_git ? "git " : "") + "\x1b[0m");
 
@@ -109,22 +112,19 @@ if (!fs.existsSync(config.release_directory) || !fs.statSync(config.release_dire
 
 log("updating " + targets.map(e => e.platform).join(", ") + " manifests using " + config.source.platform + " manifest");
 
-var cleaned;
-
-for (field in source_manifest) {
-    if (!source_manifest[field] ||
-        Array.isArray(source_manifest[field]) ? !source_manifest[field].length : false ||
-            typeof source_manifest[field] === 'object' ? !Object.keys(source_manifest[field]).length : false) {
-        log_w(field + " field is empty");
-        if (config.clean_manifest) {
+// clean manifest
+if (config.clean_manifest) {
+    for (field in source_manifest) {
+        if (!source_manifest[field] ||
+            Array.isArray(source_manifest[field]) ? !source_manifest[field].length : false ||
+                typeof source_manifest[field] === 'object' ? !Object.keys(source_manifest[field]).length : false) {
+            log_w(field + " field is empty");
             delete source_manifest[field];
             log("cleaned field " + field);
             cleaned = true;
         }
     }
-}
 
-if (config.clean_manifest && cleaned) {
     fs.writeFileSync(config.source.directory + "/manifest.json", JSON.stringify(source_manifest, null, 2));
     log("wrote cleaned manifest to source file");
 }
