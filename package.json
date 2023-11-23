@@ -10,7 +10,9 @@
   ],
   "version": "1.0.5",
   "main": "build.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4"
+  },
   "scripts": {
     "build": "node build.js"
   },
