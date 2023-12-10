@@ -3,11 +3,17 @@ type BuildAction = "copy" | "package";
 type BuildPlatform = "chrome" | "firefox" | "opera";
 
 type BuildTarget = {
+  // directory: string; directories will be temporary
+  platform: BuildPlatform;
+  manifest_version: number; // assume 3
+  patch: string[];
+};
+
+type BuildSource = {
   directory: string;
   platform: BuildPlatform;
   manifest_version: number;
   patch: string[];
-  temp: boolean;
 };
 
 type BuildConfig = {
@@ -16,7 +22,7 @@ type BuildConfig = {
   clean_manifest: boolean;
   default_actions: BuildAction[];
   release_directory: string;
-  source: BuildTarget;
+  source: BuildSource;
   targets: BuildTarget[];
   git_messages: {
     packages: string;
@@ -59,3 +65,11 @@ type ManivestV3 = {
   };
   permissions: string[];
 };
+
+interface SystemHandler {
+  (
+    config: BuildConfig,
+    sourceManifest: ManivestV3,
+    buildTarget: BuildTarget
+  ): void;
+}
